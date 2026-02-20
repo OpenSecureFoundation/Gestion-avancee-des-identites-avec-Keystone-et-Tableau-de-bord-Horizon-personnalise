@@ -1,0 +1,22 @@
+# --- Général ---
+.git/
+.tox/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+*.sqlite
+*.db
+
+# --- Keystone ---
+keystone/etc/keystone/keystone.conf.sample
+keystone/etc/keystone/sso_callback_template.html
+
+# --- Horizon ---
+horizon/openstack_dashboard/local/local_settings.py
+horizon/static/
+horizon/.secret_key_store
+
+# (Optionnel) Sauvegardes
+backups/
