@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block main %}
+<div class="container-fluid">
+    <h2>{% trans "Configuration MFA" %}</h2>
+
+    {% if non_autorise %}
+        <div class="alert alert-warning" style="margin-top: 20px;">
+            <h4><span class="fa fa-lock"></span> Accès restreint</h4>
+            <p>Vous n'êtes pas autorisé à configurer l'authentification multifacteur. Contactez votre administrateur.</p>
+        </div>
+
+    {% elif already_configured %}
+        <div class="alert alert-success" style="margin-top: 20px;">
+            <h4><span class="fa fa-check-circle"></span> MFA Actif</h4>
+            <p>Votre authentification à double facteur est déjà configurée et activée.</p>
+        </div>
+
+    {% elif error_keystone %}
+        <div class="alert alert-danger" style="margin-top: 20px;">
+            <h4><span class="fa fa-exclamation-triangle"></span> Action bloquée par Keystone</h4>
+            <p>{{ error_keystone }}</p>
+        </div>
+
+    {% elif qr_code %}
+        <div class="alert alert-info" style="margin-top: 20px;">
+            {% trans "Étape 1 : Scannez ce QR Code avec Google Authenticator ou Authy." %}
+        </div>
+        
+        <div class="text-center" style="margin: 30px 0;">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code MFA" style="width: 250px; height: 250px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;" />
+        </div>
+        
+        <div class="text-center mt-4">
+            <form method="post" action="{% url 'horizon:settings:mfa:activer' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg">
+                    <span class="fa fa-shield"></span> {% trans "J'ai scanné le code, Activer mon MFA !" %}
+                </button>
+            </form>
+        </div>
+
+    {% else %}
+        <div class="alert alert-secondary" style="margin-top: 20px;">
+            <p>État inconnu. Le QR Code n'a pas pu être généré mais aucune erreur n'est remontée.</p>
+        </div>
+    {% endif %}
+    
+</div>
+{% endblock %}

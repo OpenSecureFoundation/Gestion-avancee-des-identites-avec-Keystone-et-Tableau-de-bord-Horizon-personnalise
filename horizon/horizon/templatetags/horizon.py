@@ -51,7 +51,7 @@ def has_permissions_on_list(components, user):
 
 
 @register.inclusion_tag('horizon/_sidebar.html', takes_context=True)
-def horizon_nav(context):
+def horizon_nav(context): 
     if 'request' not in context:
         return {}
     current_dashboard = context['request'].horizon.get('dashboard', None)

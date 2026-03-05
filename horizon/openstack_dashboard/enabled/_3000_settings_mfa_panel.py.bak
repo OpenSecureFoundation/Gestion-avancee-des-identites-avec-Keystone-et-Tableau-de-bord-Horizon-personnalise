@@ -1,0 +1,11 @@
+# Le nom du dashboard de destination (Settings)
+PANEL_DASHBOARD = 'settings'
+
+# Le nom du groupe dans lequel il apparaîtra (User Settings)
+PANEL_GROUP = 'default'
+
+# L'ID de notre panel
+PANEL = 'mfa'
+
+# Le chemin python vers le fichier panel.py que tu as créé tout au début
+ADD_PANEL = 'openstack_dashboard.dashboards.settings.mfa.panel.Mfa'

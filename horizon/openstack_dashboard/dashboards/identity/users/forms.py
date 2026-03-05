@@ -341,3 +341,59 @@ class ChangePasswordForm(PasswordMixin, forms.SelfHandlingForm):
             return response
 
         return True
+
+# --- DEBUT UpdateMfaForm ---
+class UpdateMfaForm(forms.SelfHandlingForm):
+    user_id = forms.CharField(widget=forms.HiddenInput())
+    mfa_enabled = forms.BooleanField(
+        label=_("Activer MFA (Google Authenticator)"), 
+        required=False,
+        help_text=_("Exige un code TOTP à 6 chiffres lors de la connexion de cet utilisateur.")
+    )
+
+    # On ajoute __init__ pour cocher la case si le MFA est déjà actif
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(request, *args, **kwargs)
+        user_id = self.initial.get('user_id')
+        
+        if user_id:
+            try:
+                # On récupère l'utilisateur
+                user = api.keystone.user_get(request, user_id, admin=True)
+                options = getattr(user, 'options', {})
+                rules = options.get('multi_factor_auth_rules', [])
+                
+                # Si des règles existent, on coche la case
+                if rules:
+                    self.initial['mfa_enabled'] = True
+                else:
+                    self.initial['mfa_enabled'] = False
+            except Exception:
+                self.initial['mfa_enabled'] = False
+
+    # On corrige handle pour envoyer la vraie commande MFA à Keystone
+    def handle(self, request, data):
+        try:
+            user = api.keystone.user_get(request, data['user_id'], admin=True)
+            options = getattr(user, 'options', {})
+            
+            if data['mfa_enabled']:
+                # L'admin a coché la case : On FORCE l'activation du MFA natif
+                options['multi_factor_auth_rules'] = [['password', 'totp']]
+            else:
+                # L'admin a décoché la case : On VIDE les règles MFA
+                options['multi_factor_auth_rules'] = []
+                
+            # On met à jour l'utilisateur en écrasant ses anciennes options
+            api.keystone.user_update(
+                request, 
+                data['user_id'], 
+                options=options
+            )
+            
+            messages.success(request, _("Le statut MFA a été mis à jour avec succès."))
+            return True
+        except Exception:
+            exceptions.handle(request, _("Erreur lors de la mise à jour du MFA."))
+            return False
+# --- FIN UpdateMfaForm ---

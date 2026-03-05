@@ -40,4 +40,9 @@ else:
                 views.DetailView.as_view(), name='detail'),
         re_path(r'^(?P<user_id>[^/]+)/change_password/$',
                 views.ChangePasswordView.as_view(), name='change_password'),
+        
+        # --- DEBUT UpdateMfaView ---
+        re_path(r'^(?P<user_id>[^/]+)/update_mfa/$', 
+                views.UpdateMfaView.as_view(), name='update_mfa'),
+        # --- FIN UpdateMfaView ---
     ]

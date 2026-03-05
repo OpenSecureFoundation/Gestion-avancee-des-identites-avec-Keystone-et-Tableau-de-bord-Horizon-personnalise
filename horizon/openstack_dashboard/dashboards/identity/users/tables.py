@@ -68,6 +68,19 @@ class ChangePasswordLink(policy.PolicyTargetMixin, tables.LinkAction):
         lock_password = options.get("lock_password", False)
         return not lock_password and api.keystone.keystone_can_edit_user()
 
+class UpdateMfaLink(policy.PolicyTargetMixin, tables.LinkAction):
+    name = "update_mfa"
+    verbose_name = _("Paramètres MFA")
+    url = "horizon:identity:users:update_mfa"
+    classes = ("ajax-modal",)
+    icon = "shield"
+    policy_rules = (("identity", "identity:update_user"),)
+    policy_target_attrs = (("user_id", "id"),
+                           ("target.user.domain_id", "domain_id"))
+
+    def allowed(self, request, user):
+        return api.keystone.keystone_can_edit_user()
+
 
 class ToggleEnabled(policy.PolicyTargetMixin, tables.BatchAction):
     name = "toggle"
@@ -206,6 +219,19 @@ class UsersTable(tables.DataTable):
                             filters=(defaultfilters.yesno,
                                      defaultfilters.capfirst),
                             empty_value="False")
+    
+    # --- DEBUT : Colonne MFA ---
+   
+    mfa_enabled = tables.Column(
+        lambda obj: bool(getattr(obj, 'options', {}).get('multi_factor_auth_rules', [])),
+        verbose_name=_('MFA Activé'),
+        status=True,                     # Active le rendu visuel (couleurs/icônes)
+        status_choices=STATUS_CHOICES,   # Utilise le dictionnaire True/False de Horizon
+        filters=(defaultfilters.yesno, defaultfilters.capfirst),
+        empty_value="False"
+    )
+    # --- FIN ---
+
     domain_name = tables.Column('domain_name',
                                 verbose_name=_('Domain Name'),
                                 attrs={'data-type': 'uuid'})
@@ -213,7 +239,8 @@ class UsersTable(tables.DataTable):
     class Meta(object):
         name = "users"
         verbose_name = _("Users")
-        row_actions = (EditUserLink, ChangePasswordLink, ToggleEnabled,
+        # --- AJOUT DE UpdateMfaLink DANS LES ACTIONS ---
+        row_actions = (EditUserLink, UpdateMfaLink, ChangePasswordLink, ToggleEnabled,
                        DeleteUsersAction)
         table_actions = (UserFilterAction, CreateUserLink, DeleteUsersAction)
         row_class = UpdateRow

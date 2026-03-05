@@ -164,7 +164,17 @@ INSTALLED_APPS = [
     'openstack_auth',
 ]
 
-AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dashboard.sqlite3'),
+    }
+}
+
+AUTHENTICATION_BACKENDS = (
+    'openstack_auth.backend.KeystoneBackend',
+    )
+
 AUTH_USER_MODEL = 'openstack_auth.User'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 

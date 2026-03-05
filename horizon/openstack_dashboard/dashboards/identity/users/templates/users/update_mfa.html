@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Paramètres MFA" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Paramètres MFA") %}
+{% endblock page_header %}
+
+{% block main %}
+    {% include "identity/users/_update_mfa.html" %}
+{% endblock %}

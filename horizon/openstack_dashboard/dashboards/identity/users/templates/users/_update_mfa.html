@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<form id="update_mfa_form" class="form-horizontal" action="{{ submit_url }}" method="POST">
+  {% csrf_token %}
+  
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3 class="modal-title">{% trans "Paramètres MFA" %}</h3>
+  </div>
+
+  <div class="modal-body clearfix">
+    <div class="left">
+      <fieldset>
+        {% include "horizon/common/_form_fields.html" %}
+      </fieldset>
+    </div>
+    <div class="right">
+      <h3>{% trans "Description" %}</h3>
+      <p>{% trans "Activez ou désactivez l'autorisation pour cet utilisateur de configurer son application Google Authenticator." %}</p>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <input class="btn btn-primary pull-right" type="submit" value="{% trans 'Enregistrer' %}" />
+    <a href="{% url 'horizon:identity:users:index' %}" class="btn btn-default secondary cancel close">{% trans "Annuler" %}</a>
+  </div>
+</form>

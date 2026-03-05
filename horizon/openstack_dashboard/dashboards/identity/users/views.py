@@ -265,3 +265,31 @@ class ChangePasswordView(forms.ModalFormView):
         user = self.get_object()
         return {'id': self.kwargs['user_id'],
                 'name': user.name}
+
+
+# --- DEBUT UpdateMfaView ---
+class UpdateMfaView(forms.ModalFormView):
+    form_class = project_forms.UpdateMfaForm
+    template_name = 'identity/users/update_mfa.html'
+    success_url = reverse_lazy('horizon:identity:users:index')
+    page_title = _("Paramètres MFA")
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateMfaView, self).get_context_data(**kwargs)
+        context['user_id'] = self.kwargs['user_id']
+        context['submit_url'] = reverse_lazy('horizon:identity:users:update_mfa', args=[self.kwargs['user_id']])
+        return context
+
+    
+    def get_initial(self):
+        user = api.keystone.user_get(self.request, self.kwargs['user_id'], admin=True)
+        
+        # On lit les règles officielles
+        options = getattr(user, 'options', {})
+        mfa_rules = options.get('mfa_autorise', [])
+        
+        return {
+            'user_id': self.kwargs['user_id'], 
+            'mfa_enabled': bool(mfa_rules)  # True si des règles existent, sinon False
+        }
+# --- FIN UpdateMfaView ---

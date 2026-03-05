@@ -326,6 +326,7 @@ class AuthTokenResource(_AuthFederationWebSSOBase):
         auth_data = self.request_body_json.get('auth')
         auth_schema.validate_issue_token_auth(auth_data)
         token = authentication.authenticate_for_token(auth_data)
+
         resp_data = render_token.render_token_response_from_model(
             token, include_catalog=include_catalog
         )

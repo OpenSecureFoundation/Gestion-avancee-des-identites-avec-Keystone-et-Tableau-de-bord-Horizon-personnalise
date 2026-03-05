@@ -1,0 +1,6 @@
+# Autorise l'utilisateur à se mettre à jour lui-même
+"identity:update_user": "rule:admin_required or user_id:%(target.user.id)s"
+
+# Par sécurité, on ajoute aussi celle-ci pour les credentials
+"identity:create_credential": "rule:admin_required or user_id:%(target.credential.user_id)s"
+"identity:list_credentials": "rule:admin_required or user_id:%(target.credential.user_id)s"
