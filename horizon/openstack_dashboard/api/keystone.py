@@ -1098,6 +1098,17 @@ def abac_context_delete(request, context_id):
     client = keystoneclient(request, admin=True)
     return client.session.delete(f'/context_definitions/{context_id}', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
 
+
+@profiler.trace
+def abac_audit_log_list(request):
+    """Récupère l'historique d'audit ABAC depuis Keystone."""
+    client = keystoneclient(request, admin=True)
+    # On interroge la nouvelle route API qu'on a créée dans Keystone
+    response = client.session.get('/abac_audit_logs', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+    # On extrait la liste du JSON
+    return response.json().get('abac_audit_logs', [])
+
+
 # =====================================================================
 # FIN : API CUSTOM POUR ABAC
 # =====================================================================

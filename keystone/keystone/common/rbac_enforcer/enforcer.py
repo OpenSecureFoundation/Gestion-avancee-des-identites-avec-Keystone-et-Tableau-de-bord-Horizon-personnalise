@@ -564,14 +564,46 @@ class RBACEnforcer:
                         conditions_met = False
                         break
 
+                # Appliquer l'effet (Deny ou Allow) ET Enregistrer l'Audit
                 if conditions_met:
                     if policy['effect'] == 'deny':
-                        LOG.warning("ABAC: Requete BLOQUEE par la regle '%s'.", policy['name'])
+                        msg = f"Requete BLOQUEE. Condition remplie: {extract_key} {operator} {expected_val} (Valeur lue: {actual_val})"
+                        LOG.warning(f"ABAC: {msg}")
+                        # Enregistrement dans la DB
+                        PROVIDER_APIS.policy_api.create_abac_audit_log(
+                            user_id=getattr(ctxt, 'user_id', 'Inconnu'),
+                            target_action=action,
+                            policy_name=policy['name'],
+                            effect='deny',
+                            details=msg
+                        )
                         raise exception.ForbiddenAction(action=action)
                     else:
-                        LOG.debug("ABAC: Requete AUTORISEE par la regle '%s'.", policy['name'])
+                        msg = f"Requete AUTORISEE. Condition remplie: {extract_key} {operator} {expected_val}"
+                        LOG.debug(f"ABAC: {msg}")
+                        # Enregistrement dans la DB
+                        PROVIDER_APIS.policy_api.create_abac_audit_log(
+                            user_id=getattr(ctxt, 'user_id', 'Inconnu'),
+                            target_action=action,
+                            policy_name=policy['name'],
+                            effect='allow',
+                            details=msg
+                        )
+                        # Si Allow, on peut s'arrêter là et laisser passer la requête
+                        break
                 else:
+                    # Si les conditions ne sont pas remplies et que la règle est "allow" (exclusif)
                     if policy['effect'] == 'allow':
+                        msg = f"Requete BLOQUEE. Condition NON remplie: {extract_key} {operator} {expected_val} (Valeur lue: {actual_val})"
+                        LOG.warning(f"ABAC: {msg}")
+                        # Enregistrement dans la DB
+                        PROVIDER_APIS.policy_api.create_abac_audit_log(
+                            user_id=getattr(ctxt, 'user_id', 'Inconnu'),
+                            target_action=action,
+                            policy_name=policy['name'],
+                            effect='deny',  # L'effet final est un blocage
+                            details=msg
+                        )
                         raise exception.ForbiddenAction(action=action)
 
         except exception.ForbiddenAction:

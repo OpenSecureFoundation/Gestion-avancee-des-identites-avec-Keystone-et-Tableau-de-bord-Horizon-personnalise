@@ -12,13 +12,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
 from keystone.common import sql
 from keystone import exception
 from keystone.policy.backends import rules
 
 # --- AJOUTS POUR ABAC ---
+import datetime
 import uuid
-from sqlalchemy import orm
+from sqlalchemy import orm, Column, String, DateTime
+from oslo_utils import timeutils
 # ------------------------
 
 
@@ -70,6 +73,17 @@ class PolicyConditionModel(sql.ModelBase, sql.ModelDictMixin):
 
     # Permet d'accéder à la définition du contexte directement depuis la condition
     context_definition = orm.relationship('ContextDefinitionModel')
+
+class AbacAuditLog(sql.ModelBase, sql.ModelDictMixin):
+    __tablename__ = 'abac_audit_logs'
+    
+    id = Column(String(64), primary_key=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    user_id = Column(String(64), nullable=True)
+    target_action = Column(String(255), nullable=False)
+    policy_name = Column(String(255), nullable=False)
+    effect = Column(String(64), nullable=False) # 'allow' ou 'deny'
+    details = Column(String(255), nullable=True) # Ex: "Bloqué à cause de l'IP 10.0.0.99"
 
 # ==========================================
 # FIN DES MODÈLES ABAC
@@ -208,3 +222,25 @@ class Policy(rules.Policy):
             # Grâce au paramètre cascade='all, delete-orphan' dans nos modèles,
             # supprimer la politique va automatiquement nettoyer la table des conditions.
             session.delete(ref)
+
+    def create_abac_audit_log(self, user_id, target_action, policy_name, effect, details):
+        """Enregistre un événement de sécurité ABAC."""
+        with sql.session_for_write() as session:
+            log_ref = {
+                'id': uuid.uuid4().hex,
+                'timestamp': timeutils.utcnow(),
+                'user_id': user_id,
+                'target_action': target_action,
+                'policy_name': policy_name,
+                'effect': effect,
+                'details': details
+            }
+            new_log = AbacAuditLog.from_dict(log_ref)
+            session.add(new_log)
+            return new_log.to_dict()
+
+    def list_abac_audit_logs(self):
+        """Récupère tout l'historique pour le tableau de bord Horizon."""
+        with sql.session_for_read() as session:
+            query = session.query(AbacAuditLog).order_by(AbacAuditLog.timestamp.desc())
+            return [log.to_dict() for log in query.all()]

@@ -164,6 +164,18 @@ class AbacPolicyResource(ks_flask.ResourceBase):
         PROVIDERS.policy_api.delete_abac_policy(abac_policy_id)
         return None, http.client.NO_CONTENT
 
+
+class AbacAuditLogListResource(ks_flask.ResourceBase):
+    collection_key = 'abac_audit_logs'
+    member_key = 'abac_audit_log'
+
+    def get(self):
+        """Horizon appelle cette méthode pour récupérer les logs."""
+        ENFORCER.enforce_call(action='identity:list_policies')
+        
+        logs = PROVIDERS.policy_api.list_abac_audit_logs()
+        return self.wrap_collection(logs)
+    
 # ==========================================
 # FIN DES ROUTES API ABAC
 # ==========================================
@@ -290,7 +302,7 @@ class PolicyAPI(ks_flask.APIBase):
     _name = 'policy'
     _import_name = __name__
     # On ajoute PolicyResource (existant) ET nos nouvelles ressources (AbacPolicyResource)
-    resources = [PolicyResource, AbacPolicyResource, AbacContextResource]
+    resources = [PolicyResource, AbacPolicyResource, AbacContextResource, AbacAuditLogListResource]
     resource_mapping = [
         
         # (Les lignes existantes restent identiques ci-dessous)
