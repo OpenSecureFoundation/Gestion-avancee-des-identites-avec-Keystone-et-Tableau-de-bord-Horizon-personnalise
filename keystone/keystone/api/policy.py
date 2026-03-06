@@ -101,6 +101,75 @@ class PolicyResource(ks_flask.ResourceBase):
         return (res, http.client.NO_CONTENT)
 
 
+# ==========================================
+# DÉBUT DES ROUTES API ABAC
+# ==========================================
+
+class AbacContextResource(ks_flask.ResourceBase):
+    collection_key = 'context_definitions'
+    member_key = 'context_definition'
+
+    def get(self, context_id=None):
+        if context_id:
+            # Récupérer un contexte précis
+            ENFORCER.enforce_call(action='identity:get_policy') # On réutilise les droits admin policy
+            ref = PROVIDERS.policy_api.get_context_definition(context_id)
+            return self.wrap_member(ref)
+        
+        # Lister tous les contextes
+        ENFORCER.enforce_call(action='identity:list_policies')
+        refs = PROVIDERS.policy_api.list_context_definitions()
+        return self.wrap_collection(refs)
+
+    def post(self):
+        # Créer un nouveau contexte dynamique
+        ENFORCER.enforce_call(action='identity:create_policy')
+        context_body = self.request_body_json.get('context_definition', {})
+        # Note: on bypass la validation stricte JSON Schema pour le PoC
+        context_body = self._assign_unique_id(self._normalize_dict(context_body))
+        
+        ref = PROVIDERS.policy_api.create_context_definition(context_body)
+        return self.wrap_member(ref), http.client.CREATED
+
+    def delete(self, context_definition_id):
+        ENFORCER.enforce_call(action='identity:delete_policy')
+        PROVIDERS.policy_api.delete_context_definition(context_definition_id)
+        return None, http.client.NO_CONTENT
+
+
+class AbacPolicyResource(ks_flask.ResourceBase):
+    collection_key = 'abac_policies'
+    member_key = 'abac_policy'
+
+    def get(self, policy_id=None):
+        if policy_id:
+            ENFORCER.enforce_call(action='identity:get_policy')
+            ref = PROVIDERS.policy_api.get_abac_policy(policy_id)
+            return self.wrap_member(ref)
+        
+        ENFORCER.enforce_call(action='identity:list_policies')
+        refs = PROVIDERS.policy_api.list_abac_policies()
+        return self.wrap_collection(refs)
+
+    def post(self):
+        ENFORCER.enforce_call(action='identity:create_policy')
+        policy_body = self.request_body_json.get('abac_policy', {})
+        policy_body = self._assign_unique_id(self._normalize_dict(policy_body))
+        
+        ref = PROVIDERS.policy_api.create_abac_policy(policy_body)
+        return self.wrap_member(ref), http.client.CREATED
+
+    def delete(self, abac_policy_id):
+        ENFORCER.enforce_call(action='identity:delete_policy')
+        PROVIDERS.policy_api.delete_abac_policy(abac_policy_id)
+        return None, http.client.NO_CONTENT
+
+# ==========================================
+# FIN DES ROUTES API ABAC
+# ==========================================
+
+
+
 class EndpointPolicyResource(flask_restful.Resource):
     def get(self, policy_id):
         ENFORCER.enforce_call(action='identity:list_endpoints_for_policy')
@@ -220,8 +289,11 @@ class ServiceRegionPolicyAssociations(flask_restful.Resource):
 class PolicyAPI(ks_flask.APIBase):
     _name = 'policy'
     _import_name = __name__
-    resources = [PolicyResource]
+    # On ajoute PolicyResource (existant) ET nos nouvelles ressources (AbacPolicyResource)
+    resources = [PolicyResource, AbacPolicyResource, AbacContextResource]
     resource_mapping = [
+        
+        # (Les lignes existantes restent identiques ci-dessous)
         ks_flask.construct_resource_map(
             resource=EndpointPolicyResource,
             url='/policies/<string:policy_id>/OS-ENDPOINT-POLICY/endpoints',
@@ -274,6 +346,5 @@ class PolicyAPI(ks_flask.APIBase):
             resource_relation_func=_resource_rel_func,
         ),
     ]
-
 
 APIs = (PolicyAPI,)

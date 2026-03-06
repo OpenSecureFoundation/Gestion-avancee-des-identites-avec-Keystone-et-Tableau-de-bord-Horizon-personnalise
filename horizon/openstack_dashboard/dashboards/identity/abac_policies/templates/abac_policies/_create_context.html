@@ -1,0 +1,20 @@
+{% extends 'horizon/common/_modal_form.html' %}
+{% load i18n %}
+
+{% block form_id %}create_context_form{% endblock %}
+{% block form_action %}{% url 'horizon:identity:abac_policies:create_context' %}{% endblock %}
+
+{% block modal-header %}{% trans "Creer un nouveau contexte " %}{% endblock %}
+
+{% block modal-body %}
+  <div class="left">
+    <fieldset>
+      {% include "horizon/common/_form_fields.html" %}
+    </fieldset>
+  </div>
+  <div class="right">
+    <h3>{% trans "Comment ça marche ?" %}</h3>
+    <p>{% trans "Définissez ici l'attribut que Keystone devra analyser lors d'une connexion." %}</p>
+    <p><strong>Exemple :</strong> Si vous voulez filtrer par pays, entrez <em>HTTP_CF_IPCOUNTRY</em> dans la clé d'extraction.</p>
+  </div>
+{% endblock %}

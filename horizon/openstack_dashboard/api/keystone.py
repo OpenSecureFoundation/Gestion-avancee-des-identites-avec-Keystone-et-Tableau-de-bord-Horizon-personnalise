@@ -1032,3 +1032,72 @@ def application_credential_create(request, name, secret=None,
                               access_rules=access_rules)
     except keystone_exceptions.Conflict:
         raise exceptions.Conflict()
+
+
+
+# =====================================================================
+# DÉBUT : API CUSTOM POUR ABAC
+# =====================================================================
+
+@profiler.trace
+def abac_context_list(request):
+    """Récupère la liste de toutes les définitions de contextes dynamiques."""
+    client = keystoneclient(request, admin=True)
+    # On utilise la session brute pour taper sur notre nouvelle route API
+    response = client.session.get('/context_definitions', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+    return response.json().get('context_definitions', [])
+
+@profiler.trace
+def abac_context_create(request, name, data_type, extraction_key, description=None):
+    """Crée un nouveau contexte dynamique (ex: Ville, Adresse IP, etc.)."""
+    client = keystoneclient(request, admin=True)
+    body = {
+        "context_definition": {
+            "name": name,
+            "data_type": data_type,
+            "extraction_key": extraction_key,
+            "description": description
+        }
+    }
+    response = client.session.post('/context_definitions', json=body, endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+    return response.json().get('context_definition')
+
+@profiler.trace
+def abac_policy_list(request):
+    """Récupère la liste de toutes les politiques ABAC existantes."""
+    client = keystoneclient(request, admin=True)
+    response = client.session.get('/abac_policies', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+    return response.json().get('abac_policies', [])
+
+@profiler.trace
+def abac_policy_create(request, name, target_action, effect, conditions, description=None):
+    """Crée une nouvelle politique ABAC avec ses conditions attachées."""
+    client = keystoneclient(request, admin=True)
+    body = {
+        "abac_policy": {
+            "name": name,
+            "target_action": target_action,
+            "effect": effect,
+            "description": description,
+            "conditions": conditions
+        }
+    }
+    response = client.session.post('/abac_policies', json=body, endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+    return response.json().get('abac_policy')
+
+
+@profiler.trace
+def abac_policy_delete(request, policy_id):
+    """Supprime une règle ABAC."""
+    client = keystoneclient(request, admin=True)
+    return client.session.delete(f'/abac_policies/{policy_id}', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+
+@profiler.trace
+def abac_context_delete(request, context_id):
+    """Supprime un contexte dynamique."""
+    client = keystoneclient(request, admin=True)
+    return client.session.delete(f'/context_definitions/{context_id}', endpoint_filter={'service_type': 'identity', 'interface': 'admin'})
+
+# =====================================================================
+# FIN : API CUSTOM POUR ABAC
+# =====================================================================

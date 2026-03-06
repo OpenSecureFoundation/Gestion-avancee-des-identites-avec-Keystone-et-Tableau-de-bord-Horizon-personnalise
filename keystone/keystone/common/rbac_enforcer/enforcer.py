@@ -504,6 +504,85 @@ class RBACEnforcer:
         )
         LOG.debug('RBAC: Authorization granted')
 
+        
+        # =====================================================================
+        # DEBUT INNOVATION : MOTEUR D'EXECUTION ABAC (POLICY ENFORCEMENT POINT)
+        # =====================================================================
+        try:
+            if 'abac_policies' in action or 'context_definitions' in action or 'identity:list_policies' in action:
+                return
+
+            # --- NOUVEAUTÉ 1 : LE PASSE-PARTOUT (ADMIN BYPASS) ---
+            # Si l'utilisateur a le rôle de super-administrateur (is_admin=True), on ne le bloque jamais.
+            # if getattr(ctxt, 'is_admin', False):
+            #     LOG.debug("ABAC: Super-Admin detecte. Contournement des regles ABAC autorise.")
+            #     return
+            # -----------------------------------------------------
+
+            all_abac_policies = PROVIDER_APIS.policy_api.list_abac_policies()
+            applicable_policies = [p for p in all_abac_policies if p['target_action'] == action]
+            # applicable_policies = [p for p in all_abac_policies if action.startswith(p['target_action'])] 
+
+            if not applicable_policies:
+                return 
+
+            req_environ = flask.request.environ
+
+            for policy in applicable_policies:
+                LOG.debug("ABAC: Evaluation de la regle '%s' pour l'action '%s'.", policy['name'], action)
+                conditions_met = True
+                
+                for condition in policy.get('conditions', []):
+                    context_def = PROVIDER_APIS.policy_api.get_context_definition(condition['context_def_id'])
+                    extract_key = context_def['extraction_key']
+                    expected_val = str(condition['value']).strip()
+                    operator = condition['operator']
+
+                    # --- NOUVEAUTÉ 2 : LES ATTRIBUTS DU SUJET (QUI FAIT LA REQUÊTE ?) ---
+                    if extract_key == 'USER_ID':
+                        # Au lieu de chercher dans l'environnement HTTP, on regarde dans le Token de l'utilisateur !
+                        actual_val = getattr(ctxt, 'user_id', '')
+                    elif extract_key == 'PROJECT_ID':
+                        actual_val = getattr(ctxt, 'project_id', '')
+                    else:
+                        # Sinon, c'est une information réseau standard (IP, Header...)
+                        actual_val = req_environ.get(extract_key)
+                    # --------------------------------------------------------------------
+                    
+                    if actual_val is None:
+                        actual_val = ""
+                    else:
+                        actual_val = str(actual_val).strip()
+
+                    if operator == '==' and actual_val != expected_val:
+                        conditions_met = False
+                        break
+                    elif operator == '!=' and actual_val == expected_val:
+                        conditions_met = False
+                        break
+                    elif operator == 'in' and expected_val not in actual_val:
+                        conditions_met = False
+                        break
+
+                if conditions_met:
+                    if policy['effect'] == 'deny':
+                        LOG.warning("ABAC: Requete BLOQUEE par la regle '%s'.", policy['name'])
+                        raise exception.ForbiddenAction(action=action)
+                    else:
+                        LOG.debug("ABAC: Requete AUTORISEE par la regle '%s'.", policy['name'])
+                else:
+                    if policy['effect'] == 'allow':
+                        raise exception.ForbiddenAction(action=action)
+
+        except exception.ForbiddenAction:
+            raise
+        except Exception as e:
+            LOG.error("ABAC: Erreur interne lors de l'evaluation: %s", str(e))
+            pass
+        # =====================================================================
+        # FIN INNOVATION ABAC
+        # =====================================================================
+
     @classmethod
     def policy_enforcer_action(cls, action):
         """Decorator to set policy enforcement action name."""
