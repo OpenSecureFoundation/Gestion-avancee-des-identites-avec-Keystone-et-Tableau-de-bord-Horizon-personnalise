@@ -1,11 +1,230 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans "Audit de Sécurité ABAC" %}{% endblock %}
+
+{% block title %}{% trans "Audit ABAC" %}{% endblock %}
 
 {% block page_header %}
-  {% include "horizon/common/_page_header.html" with title=_("Journaux d'audit et traçabilité") %}
-{% endblock page_header %}
+  {% include "horizon/common/_page_header.html" with title=_("Tableau de Bord de Sécurité") %}
+{% endblock %}
 
 {% block main %}
-  {{ table.render }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+    .kpi-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border-left: 4px solid #1E3A8A; /* Bleu par défaut */
+    }
+    .kpi-card.danger { border-left-color: #EF4444; } /* Rouge pour les blocages */
+    .kpi-card.success { border-left-color: #10B981; } /* Vert pour les utilisateurs */
+    .kpi-value { font-size: 28px; font-weight: bold; color: #1e293b; }
+    .kpi-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px;}
+    
+    .chart-container {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        height: 300px; /* Hauteur fixe pour que ce soit joli */
+    }
+    
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="filter-bar" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
+    
+    <div style="display: flex; gap: 20px; align-items: flex-end; margin: 0;">
+        
+        <div class="form-group" style="margin: 0;">
+            <label for="start_date" style="font-weight: 600; color: #334155; margin-bottom: 5px;">Date de début :</label>
+            <input type="date" id="start_date" class="form-control" value="{{ start_date }}" style="width: 200px; border-radius: 6px;">
+        </div>
+        
+        <div class="form-group" style="margin: 0;">
+            <label for="end_date" style="font-weight: 600; color: #334155; margin-bottom: 5px;">Date de fin :</label>
+            <input type="date" id="end_date" class="form-control" value="{{ end_date }}" style="width: 200px; border-radius: 6px;">
+        </div>
+        
+        <div class="form-group" style="margin: 0;">
+            <button type="button" class="btn btn-default" onclick="applyDateFilter()" style="background-color: #334155; color: white; border: none; padding: 8px 20px; font-weight: 600;">
+                <span class="fa fa-filter"></span> Filtrer le rapport
+            </button>
+            <button type="button" class="btn btn-link" onclick="window.location.href=window.location.pathname" style="color: #64748b; text-decoration: underline;">
+                Réinitialiser
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+function applyDateFilter() {
+    var start = document.getElementById('start_date').value;
+    var end = document.getElementById('end_date').value;
+    
+    // On force le navigateur à recharger la page avec les dates dans l'URL
+    var newUrl = window.location.pathname + "?start_date=" + start + "&end_date=" + end;
+    window.location.href = newUrl;
+}
+</script>
+
+<div id="pdf-report-zone">
+    
+    <div class="action-bar">
+        <h4 style="margin: 0; color: #334155; font-weight: 600;">Aperçu Analytique</h4>
+        <button id="download-pdf-btn" class="btn btn-primary" onclick="generatePDF()" style="background-color: #1E3A8A; border-color: #1E3A8A; font-weight: bold;">
+            <span class="fa fa-download"></span> Télécharger le Rapport PDF
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-label">Total des Requêtes (Période)</div>
+                <div class="kpi-value">{{ kpi_total }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card danger">
+                <div class="kpi-label">Tentatives Bloquées (DENY)</div>
+                <div class="kpi-value">{{ kpi_denied }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card success">
+                <div class="kpi-label">Utilisateurs Uniques Identifiés</div>
+                <div class="kpi-value">{{ kpi_users }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="chart-container">
+                <canvas id="effectChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="chart-container">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div> 
+<div class="row" style="margin-top: 20px;">
+    <div class="col-md-12">
+        <h4 style="color: #334155; font-weight: 600; margin-bottom: 15px;">Journaux d'Audit Détaillés</h4>
+        {{ table.render }}
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Récupération des données injectées par Python (views.py)
+    // Le filtre "|safe" empêche Django de casser le format JSON
+    const effectLabels = {{ chart_effect_labels|safe }};
+    const effectData = {{ chart_effect_data|safe }};
+    
+    const dateLabels = {{ chart_dates_labels|safe }};
+    const dateData = {{ chart_dates_data|safe }};
+
+    // 2. Création du Doughnut Chart (Décisions de sécurité)
+    const ctxEffect = document.getElementById('effectChart').getContext('2d');
+    new Chart(ctxEffect, {
+        type: 'doughnut',
+        data: {
+            labels: effectLabels,
+            datasets: [{
+                data: effectData,
+                // On met du rouge pour DENY, du vert pour ALLOW
+                backgroundColor: ['#10B981', '#EF4444', '#F59E0B'], 
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { display: true, text: 'Répartition des Décisions', font: {size: 14} },
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // 3. Création du Line Chart (Timeline des requêtes)
+    const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+    new Chart(ctxTimeline, {
+        type: 'line',
+        data: {
+            labels: dateLabels,
+            datasets: [{
+                label: 'Nombre de requêtes d\'accès',
+                data: dateData,
+                borderColor: '#1E3A8A',
+                backgroundColor: 'rgba(30, 58, 138, 0.1)',
+                fill: true,
+                tension: 0.3, // Fait de jolies courbes au lieu de lignes cassées
+                pointBackgroundColor: '#1E3A8A'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { display: true, text: 'Évolution Temporelle des Accès', font: {size: 14} },
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+});
+</script>
+
+<script>
+function generatePDF() {
+    // 1. Changer l'état du bouton pour faire patienter l'utilisateur
+    const btn = document.getElementById('download-pdf-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="fa fa-spinner fa-spin"></span> Génération en cours...';
+    btn.disabled = true;
+
+    // 2. Cibler la zone à transformer en PDF (Nos KPI et Graphiques)
+    // Astuce : On cible 'pdf-report-zone' qu'on a déjà préparé à l'étape précédente
+    const element = document.getElementById('pdf-report-zone');
+    
+    // Obtenir la date du jour pour le nom du fichier
+    const today = new Date().toISOString().split('T')[0];
+
+    // 3. Configurer les options du PDF
+    const opt = {
+        margin:       10, // Marges en mm
+        filename:     'Rapport_Securite_ABAC_' + today + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true }, // scale: 2 améliore la netteté des graphiques
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // Mode Paysage pour bien voir les graphiques
+    };
+
+    // 4. Lancer la création du PDF
+    html2pdf().set(opt).from(element).save().then(() => {
+        // 5. Remettre le bouton dans son état normal une fois terminé
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>
+
 {% endblock %}

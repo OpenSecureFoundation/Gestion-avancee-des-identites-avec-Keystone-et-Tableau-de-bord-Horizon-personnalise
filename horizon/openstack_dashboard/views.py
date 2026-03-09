@@ -34,7 +34,17 @@ LOG = logging.getLogger(__name__)
 MESSAGES_PATH = settings.MESSAGES_PATH
 
 
+# def get_user_home(user):
+#     dashboard = horizon.get_default_dashboard()
+#     return dashboard.get_absolute_url()
+
 def get_user_home(user):
+    # Si l'utilisateur qui se connecte est un administrateur
+    if user.is_superuser:
+        # On le redirige instantanément vers le rapport de sécurité ABAC !
+        return '/identity/abac_audit/'
+    
+    # Si c'est un utilisateur classique, on garde le comportement normal d'OpenStack
     dashboard = horizon.get_default_dashboard()
     return dashboard.get_absolute_url()
 

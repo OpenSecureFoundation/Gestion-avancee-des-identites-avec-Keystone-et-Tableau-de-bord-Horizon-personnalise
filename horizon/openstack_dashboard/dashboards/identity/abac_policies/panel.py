@@ -3,7 +3,7 @@ import horizon
 from openstack_dashboard.dashboards.identity import dashboard
 
 class AbacPolicies(horizon.Panel):
-    name = _("Sécurité Avancée (ABAC)")
+    name = _("ABAC Configurations")
     slug = 'abac_policies'
     # Optionnel: on peut limiter l'accès de cet onglet aux admins uniquement
     permissions = ('openstack.roles.admin',)

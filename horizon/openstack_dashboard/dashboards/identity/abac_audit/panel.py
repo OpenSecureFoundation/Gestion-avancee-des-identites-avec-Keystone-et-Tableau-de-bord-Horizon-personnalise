@@ -3,7 +3,7 @@ import horizon
 from openstack_dashboard.dashboards.identity import dashboard
 
 class AbacAuditPanel(horizon.Panel):
-    name = _("Audit Sécurité (ABAC)")
+    name = _("Logs")
     slug = 'abac_audit'
 
 dashboard.Identity.register(AbacAuditPanel)

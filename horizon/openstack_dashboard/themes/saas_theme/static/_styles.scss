@@ -34,7 +34,7 @@
 /* Au survol et menu actif (Fond légèrement plus clair, texte blanc) */
 #sidebar a:hover, 
 #sidebar .nav-sidebar > li.active > a {
-    background-color: #334155 !important;
+    background-color: #7b8da8 !important;
     color: #ffffff !important;
     border-radius: 4px;
 }
@@ -67,4 +67,31 @@ body {
     background-color: #ffffff !important;
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+
+/* ========================================================
+   MISE EN ÉVIDENCE DE LA PAGE ACTIVE DANS LE MENU
+   ======================================================== */
+   
+/* On cible précisément l'élément de liste qui a la classe 'active' */
+#sidebar .nav > li.active > a,
+#sidebar .nav-sidebar > li.active > a,
+#sidebar ul > li.active > a {
+    background-color: #2563eb !important; /* Un bleu vif pour bien ressortir */
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-left: 4px solid #93c5fd !important; /* Une petite bordure claire à gauche */
+    border-radius: 0 4px 4px 0 !important; /* On arrondit juste le côté droit */
+}
+
+/* On s'assure que le texte des autres liens inactifs reste bien lisible */
+#sidebar .nav > li > a {
+    color: #cbd5e1 !important;
+    border-left: 4px solid transparent !important; /* Prépare la place pour la bordure */
+}
+
+/* Effet au simple survol de la souris (un peu moins fort que l'actif) */
+#sidebar .nav > li > a:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
 }
