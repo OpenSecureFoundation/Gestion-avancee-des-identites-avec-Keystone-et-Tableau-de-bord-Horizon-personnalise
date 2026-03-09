@@ -1,0 +1,70 @@
+@import "variables";
+
+/* ========================================================
+   1. CORRECTION DE LA SIDEBAR (Menu de gauche)
+   ======================================================== */
+#sidebar {
+    background-color: #1e293b !important; /* Bleu nuit profond */
+    border-right: none !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+}
+
+/* Forcer le fond transparent pour les menus déroulants et enlever les bordures blanches */
+#sidebar .panel, 
+#sidebar .panel-heading, 
+#sidebar .list-group-item,
+#sidebar .nav-sidebar > li {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+/* Couleur du texte par défaut (Gris clair lisible) */
+#sidebar a, 
+#sidebar .panel-title > a {
+    color: #ffffff !important;
+    background-color: #334155 !important;
+    transition: all 0.2s ease;
+}
+
+#sidebar .openstack-panel
+{
+    text-align: left;
+}
+
+/* Au survol et menu actif (Fond légèrement plus clair, texte blanc) */
+#sidebar a:hover, 
+#sidebar .nav-sidebar > li.active > a {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border-radius: 4px;
+}
+
+/* ========================================================
+   2. CORRECTION DE LA NAVBAR (Barre du haut)
+   ======================================================== */
+.navbar-fixed-top {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+
+/* Restreindre la taille de ce logo géant */
+.navbar-brand img {
+    max-height: 35px !important;
+    width: auto !important;
+    margin-top: -5px !important;
+}
+
+/* ========================================================
+   3. CORRECTION DU CONTENU (Effet Carte)
+   ======================================================== */
+body {
+    background-color: #f8fafc !important; /* Fond gris très clair pour faire ressortir les tableaux */
+}
+
+/* Les tableaux de données */
+.table {
+    background-color: #ffffff !important;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}

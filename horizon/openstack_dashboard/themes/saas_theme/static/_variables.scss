@@ -1,0 +1,84 @@
+// ========================================================================
+// 🎨 THEME SAAS : MODERNISATION UI/UX
+// ========================================================================
+
+// --------------------------------------------------
+// 1. TYPOGRAPHIE : Fini le texte tout petit et daté
+// --------------------------------------------------
+// On utilise les polices natives des systèmes d'exploitation modernes pour un rendu ultra-net
+$font-family-sans-serif: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-base:         14px; // (Défaut 13px) Un poil plus grand pour la lisibilité
+$line-height-base:       1.5;  // Plus d'espace entre les lignes
+
+// --------------------------------------------------
+// 2. PALETTE DE COULEURS : Douceur et professionnalisme
+// --------------------------------------------------
+// Les gris "Slate" froids et élégants (exit les gris ternes)
+$gray-darker:            #1e293b; // Texte principal très sombre
+$gray-dark:              #334155; // Texte secondaire
+$gray:                   #64748b; // Icônes et textes muets
+$gray-light:             #94a3b8; // Placeholders
+$gray-lighter:           #f1f5f9; // Backgrounds secondaires
+
+// Couleurs de marque dynamiques
+$brand-primary:          #4f46e5; // Indigo vibrant (très SaaS)
+$brand-success:          #10b981; // Vert émeraude franc
+$brand-info:             #0ea5e9; // Bleu ciel lumineux
+$brand-warning:          #f59e0b; // Ambre chaleureux
+$brand-danger:           #ef4444; // Rouge doux (non agressif)
+
+// Fond de page légèrement gris pour faire ressortir les panneaux blancs !
+$body-bg:                #f8fafc; 
+$text-color:             $gray-darker;
+
+// --------------------------------------------------
+// 3. COMPOSANTS ET BOUTONS : Arrondis et cliquabilité
+// --------------------------------------------------
+// Des angles plus ronds pour un côté plus accueillant
+$border-radius-base:     6px;  // (Défaut 4px)
+$border-radius-large:    8px;  // (Défaut 6px)
+$border-radius-small:    4px;
+
+// Boutons plus aérés, plus faciles à cliquer
+$padding-base-vertical:  8px;
+$padding-base-horizontal: 16px;
+
+// --------------------------------------------------
+// 4. TABLEAUX (DataTables) : Clarté de la donnée
+// --------------------------------------------------
+$table-cell-padding:     12px; // Les cellules respirent enfin !
+$table-bg:               #ffffff;
+$table-border-color:     #e2e8f0; // Bordures très discrètes
+$table-bg-hover:         #f8fafc; // Survol doux
+
+// --------------------------------------------------
+// 5. PANNEAUX (Panels) : L'effet "Carte"
+// --------------------------------------------------
+$panel-bg:               #ffffff;
+$panel-border-radius:    8px;
+$panel-inner-border:     #e2e8f0;
+$panel-default-border:   transparent; // On supprime la ligne dure autour des panels
+$panel-heading-padding:  16px 20px;
+
+// --------------------------------------------------
+// 6. FORMULAIRES (Inputs) : Plus grands, plus clairs
+// --------------------------------------------------
+$input-bg:               #ffffff;
+$input-border:           #cbd5e1;
+$input-border-radius:    6px;
+$input-border-focus:     #a5b4fc; // Halo indigo clair au focus
+$input-color-placeholder:#94a3b8;
+$input-height-base:      40px; // (Défaut ~34px) Des champs de saisie dignes de 2024
+
+// --------------------------------------------------
+// 7. BARRE DE NAVIGATION : Espace et minimalisme
+// --------------------------------------------------
+$navbar-height:          64px; // Plus haute (Défaut 36px)
+$navbar-default-bg:      #ffffff;
+$navbar-default-border:  #e2e8f0;
+$navbar-default-link-color: $gray-dark;
+
+
+// 🚨 INDISPENSABLE : On importe les variables par défaut d'Horizon 
+// pour tout ce qu'on n'a pas défini au-dessus (ex: tailles de modales, z-index...)
+@import "/themes/default/variables";
