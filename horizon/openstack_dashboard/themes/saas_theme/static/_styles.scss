@@ -95,3 +95,244 @@ body {
     background-color: #334155 !important;
     color: #ffffff !important;
 }
+
+
+// /* ========================================================
+//    ✨ THÈME GLASSMORPHISM POUR LOGIN ET MFA (CORRIGÉ)
+//    ======================================================== */
+
+// /* 1. L'Arrière-plan (Dégradé profond propre) */
+// body#splash {
+//     background: radial-gradient(circle at center, #2d3748 0%, #1a202c 100%) !important;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+// }
+
+// /* 2. Tuer le fond blanc natif d'OpenStack */
+// #splash .login,
+// #splash .login-center {
+//     background-color: transparent !important;
+//     box-shadow: none !important;
+//     border: none !important;
+// }
+
+// // /* 3. Le Panneau de Verre (Frosted Glass Effect) */
+// // #splash .modal-dialog {
+// //     width: 100% !important;
+// //     max-width: 420px !important;
+// //     margin: 0 auto !important;
+// //     padding-top: 10vh !important;
+// // }
+
+// // #splash .modal-content {
+// //     /* La transparence du verre */
+// //     background-color: rgba(255, 255, 255, 0.08) !important;
+// //     backdrop-filter: blur(15px) !important;
+// //     -webkit-backdrop-filter: blur(15px) !important;
+    
+// //     border-radius: 20px !important;
+// //     border: 1px solid rgba(255, 255, 255, 0.15) !important;
+// //     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+// //     padding: 30px !important;
+// // }
+
+// /* 4. L'En-tête (Logo et Texte) */
+// #splash .modal-header {
+//     border-bottom: none !important;
+//     text-align: center !important;
+//     padding-bottom: 15px !important;
+// }
+
+// /* On met un petit fond blanc doux derrière le logo pour qu'il reste lisible */
+// #splash .modal-header img {
+//     max-height: 45px !important;
+//     margin-bottom: 20px !important;
+//     background-color: rgba(255, 255, 255, 0.9) !important;
+//     padding: 8px 15px !important;
+//     border-radius: 8px !important;
+// }
+
+// #splash .modal-header h3 {
+//     color: #ffffff !important;
+//     font-weight: 700 !important;
+//     font-size: 22px !important;
+//     letter-spacing: 0.05em !important;
+// }
+
+// /* 5. Les Champs de Saisie (Lisibles sur fond sombre) */
+// #splash .form-control {
+//     height: 48px !important;
+//     border-radius: 10px !important;
+//     background-color: rgba(255, 255, 255, 0.1) !important; /* Un peu plus opaque */
+//     border: 1px solid rgba(129, 86, 86, 0.651) !important;
+//     color: rgba(129, 140, 248, 0.8)!important; /* Texte de saisie en blanc */
+//     font-size: 14px !important;
+//     box-shadow: none !important;
+//     transition: all 0.2s ease !important;
+// }
+
+// #splash .form-control::placeholder {
+//     color: rgba(255, 255, 255, 0.5) !important;
+// }
+
+// /* Effet au focus */
+// #splash .form-control:focus {
+//     border-color: rgb(0, 0, 3) !important;
+//     background-color: rgba(255, 255, 255, 0.15) !important;
+//     box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3) !important;
+// }
+
+// #splash label {
+//     font-weight: 600 !important;
+//     color: rgba(0, 0, 0, 0.993) !important; /* Gris très clair */
+//     font-size: 13px !important;
+//     margin-bottom: 6px !important;
+// }
+
+// /* 6. Le Bouton Volumineux */
+// #splash .modal-footer {
+//     border-top: none !important;
+//     padding-top: 15px !important;
+// }
+
+// #splash .btn-primary {
+//     width: 100% !important;
+//     height: 48px !important;
+//     border-radius: 10px !important;
+//     font-size: 16px !important;
+//     font-weight: 600 !important;
+//     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+//     border: none !important;
+//     box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4) !important;
+//     color: #ffffff !important;
+//     transition: all 0.2s ease !important;
+// }
+
+// #splash .btn-primary:hover {
+//     transform: translateY(-2px) !important;
+//     box-shadow: 0 7px 20px rgba(118, 75, 162, 0.6) !important;
+// }
+
+/* ========================================================
+   ✨ THÈME GLASSMORPHISM POUR LOGIN ET MFA
+   ======================================================== */
+
+/* 1. L'Arrière-plan (Dégradé doux et texture subtile) */
+body#splash {
+    background:
+        radial-gradient(circle at center, #2d3748 0%, #1a202c 100%),
+        url('data:image/svg+xml;base64,...') !important; /* Ajoutez ici une texture SVG de grille fine si désiré */
+    background-size: cover, 20px 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 3. Tuer le vieux fond blanc d'OpenStack (Correction Bootstrap) */
+#splash .login,
+#splash .login-center,
+#splash .panel {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.panel-footer
+ {
+    padding: 15px;
+    background-color: transparent; 
+    border-top: 2px solid #e2e8f0; 
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+
+/* 2. Le Panneau de Verre (Frosted Glass Effect) */
+#splash .modal-dialog {
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    padding-top: 10vh;
+}
+
+#splash .modal-content {
+    /* La Magie du Verre Dépoli */
+    background-color: rgba(255, 255, 255, 0.08) !important; /* Transparence */
+    backdrop-filter: blur(15px) !important; /* Flou d'arrière-plan */
+    -webkit-backdrop-filter: blur(15px) !important;
+
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Bordure lumineuse */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important; /* Profondeur */
+    padding: 30px !important;
+}
+
+/* 3. L'En-tête (Logo et Texte) */
+#splash .modal-header {
+    border-bottom: none !important;
+    text-align: center !important;
+    padding-bottom: 15px !important;
+}
+
+#splash .modal-header img {
+    max-height: 50px !important;
+    margin-bottom: 20px !important;
+}
+
+#splash .modal-header h3 {
+    color: #edf2f7 !important; /* Texte clair sur fond sombre */
+    font-weight: 700 !important;
+    font-size: 20px !important;
+}
+
+/* 4. Les Champs de Saisie (Intégration "Verre") */
+#splash .form-control {
+    height: 48px !important;
+    border-radius: 10px !important;
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Fond translucide */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Effet au focus (Halo lumineux) */
+#splash .form-control:focus {
+    border-color: rgba(129, 140, 248, 0.6) !important;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+}
+
+#splash label {
+    font-weight: 600 !important;
+    color: #a0aec0 !important;
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+}
+
+/* 5. Le Bouton Volumineux */
+#splash .modal-footer {
+    border-top: none !important;
+    padding-top: 15px !important;
+}
+
+#splash .btn-primary {
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+
+    /* Dégradé pour le volume */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 6px rgba(118, 75, 162, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+#splash .btn-primary:hover {
+    transform: translateY(-2px) !important; /* Soulèvement au survol */
+    box-shadow: 0 7px 14px rgba(118, 75, 162, 0.4) !important;
+}
+
+

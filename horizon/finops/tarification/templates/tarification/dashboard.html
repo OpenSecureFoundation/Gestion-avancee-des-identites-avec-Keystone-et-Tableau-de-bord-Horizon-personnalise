@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Tableau de bord FinOps{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_page_header.html" with title="Ma Consommation" %}
+{% endblock page_header %}
+
+{% block main %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-money"></i> Suivi Budgétaire</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row text-center">
+                    <div class="col-xs-4">
+                        <h4>Budget Alloué</h4>
+                        <h2 class="text-primary">{{ budget }} FCFA</h2>
+                    </div>
+                    <div class="col-xs-4">
+                        <h4>Coût Actuel</h4>
+                        <h2 class="text-{{ couleur }}">{{ cout_actuel }} FCFA</h2>
+                    </div>
+                    <div class="col-xs-4">
+                        <h4>Reste à charge</h4>
+                        <h2>{{ reste }} FCFA</h2>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h4>Consommation : {{ pourcentage }}%</h4>
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar progress-bar-{{ couleur }} progress-bar-striped active" 
+                         role="progressbar" 
+                         aria-valuenow="{{ pourcentage }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100" 
+                         style="width: {{ pourcentage }}%; line-height: 30px; font-size: 16px;">
+                        {{ pourcentage }}%
+                    </div>
+                </div>
+                
+                {% if couleur == 'warning' %}
+                <div class="alert alert-warning mt-3">
+                    <strong>Attention !</strong> Vous avez dépassé votre seuil d'alerte.
+                </div>
+                {% elif couleur == 'danger' %}
+                <div class="alert alert-danger mt-3">
+                    <strong>Alerte critique !</strong> Vous avez atteint votre seuil de blocage. La création de nouvelles ressources est bloquée.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="panel panel-default" style="margin-top: 20px;">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pie-chart"></i> Répartition des coûts</h3>
+            </div>
+            <div class="panel-body">
+                
+                <p><strong>Part de chaque ressource dans votre facture actuelle :</strong></p>
+                <div class="progress" style="height: 25px;">
+                  <div class="progress-bar progress-bar-info" style="width: {{ pct_vcpu }}%; line-height: 25px;">
+                    vCPU ({{ pct_vcpu }}%)
+                  </div>
+                  <div class="progress-bar progress-bar-success" style="width: {{ pct_ram }}%; line-height: 25px;">
+                    RAM ({{ pct_ram }}%)
+                  </div>
+                  <div class="progress-bar progress-bar-warning" style="width: {{ pct_disk }}%; line-height: 25px;">
+                    Disque ({{ pct_disk }}%)
+                  </div>
+                </div>
+
+                <table class="table table-striped table-bordered" style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Type de Ressource</th>
+                            <th>Quantité Consommée</th>
+                            <th>Coût (FCFA)</th>
+                            <th>Part du total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><i class="fa fa-microchip"></i> Processeur (vCPU)</strong></td>
+                            <td>{{ gnocchi_vcpus }} cœurs</td>
+                            <td>{{ cout_vcpu }}</td>
+                            <td><span class="label label-info">{{ pct_vcpu }}%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fa fa-memory"></i> Mémoire (RAM)</strong></td>
+                            <td>{{ gnocchi_ram }} Mo</td>
+                            <td>{{ cout_ram }}</td>
+                            <td><span class="label label-success">{{ pct_ram }}%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fa fa-hdd-o"></i> Stockage (Disque)</strong></td>
+                            <td>{{ gnocchi_disk }} Go</td>
+                            <td>{{ cout_disk }}</td>
+                            <td><span class="label label-warning">{{ pct_disk }}%</span></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="active">
+                            <th colspan="2" class="text-right"><strong>TOTAL</strong></th>
+                            <th><strong>{{ cout_actuel }} FCFA</strong></th>
+                            <th><strong>100%</strong></th>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
