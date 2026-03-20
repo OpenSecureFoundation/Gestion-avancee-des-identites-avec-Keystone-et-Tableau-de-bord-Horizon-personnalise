@@ -512,7 +512,7 @@ class RBACEnforcer:
             if 'abac_policies' in action or 'context_definitions' in action or 'identity:list_policies' in action:
                 return
 
-            # --- NOUVEAUTÉ 1 : LE PASSE-PARTOUT (ADMIN BYPASS) ---
+            # ---: LE PASSE-PARTOUT (ADMIN BYPASS) ---
             # Si l'utilisateur a le rôle de super-administrateur (is_admin=True), on ne le bloque jamais.
             # if getattr(ctxt, 'is_admin', False):
             #     LOG.debug("ABAC: Super-Admin detecte. Contournement des regles ABAC autorise.")

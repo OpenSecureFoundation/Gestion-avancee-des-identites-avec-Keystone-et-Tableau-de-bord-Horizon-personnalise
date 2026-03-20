@@ -117,36 +117,36 @@ from openstack_dashboard import api
 
 # --- Modèles de contextes pour simplifier la vie de l'admin ---
 CONTEXT_TEMPLATES = [
-    # 🌍 Localisation & Réseau
+    # Localisation & Réseau
     ('REMOTE_ADDR', _('Adresse IP Source (Ex: 192.168.1.100)')),
     ('HTTP_X_FORWARDED_FOR', _('IP Réelle (Si derrière un VPN/Proxy)')),
     ('HTTP_X_COUNTRY_CODE', _('Code Pays (Ex: CM, FR, US)')),
     
-    # 👤 ATTRIBUTS DU SUJET (NOUVEAU)
+    # ATTRIBUTS DU SUJET (NOUVEAU)
     ('USER_ID', _('ID de l\'utilisateur (Keystone Token)')),
     ('PROJECT_ID', _('ID du projet (Keystone Token)')), 
     
-    # 💻 Appareil & Sécurité
+    # Appareil & Sécurité
     ('HTTP_USER_AGENT', _('Navigateur / OS (User-Agent)')),
     ('wsgi.url_scheme', _('Protocole de connexion (http ou https)')),
     
-    # ⏱️ Temps & Horaires (Nécessite souvent un proxy système qui injecte ces headers)
+    #  Temps & Horaires (Nécessite souvent un proxy système qui injecte ces headers)
     ('HTTP_X_DAY_OF_WEEK', _('Jour de la semaine (Ex: Monday)')),
     ('HTTP_X_BUSINESS_HOURS', _('Heures de bureau (Ex: True / False)')),
     
-    # 🏢 Organisation
+    # Organisation
     ('HTTP_X_DEPARTMENT', _('Département de l\'employé (Ex: IT, RH)')),
 ]
 
 ACTION_CHOICES = [
-    # 🛡️ IDENTITY (Keystone - Gestion des accès)
+    # IDENTITY (Keystone - Gestion des accès)
     ('identity:list_users', _('Lister les utilisateurs (Keystone)')),
     ('identity:create_user', _('Créer un utilisateur (Keystone)')),
     ('identity:delete_user', _('Supprimer un utilisateur (Keystone)')),
     ('identity:update_project', _('Modifier un projet (Keystone)')),
     ('identity:grant_role', _('Attribuer un rôle à un utilisateur (Keystone)')),
     
-    # 🖥️ COMPUTE (Nova - Gestion des machines virtuelles)
+    # COMPUTE (Nova - Gestion des machines virtuelles)
     ('os_compute_api:servers:index', _('Lister les instances (Nova)')),
     ('os_compute_api:servers:create', _('Créer une nouvelle instance (Nova)')),
     ('os_compute_api:servers:start', _('Démarrer une instance (Nova)')),
@@ -154,12 +154,12 @@ ACTION_CHOICES = [
     ('os_compute_api:servers:delete', _('Détruire une instance (Nova)')),
     ('os_compute_api:servers:resize', _('Redimensionner une instance (Nova)')),
     
-    # 🌐 NETWORK (Neutron - Gestion du réseau)
+    # NETWORK (Neutron - Gestion du réseau)
     ('create_network', _('Créer un réseau virtuel (Neutron)')),
     ('delete_network', _('Supprimer un réseau (Neutron)')),
     ('create_security_group', _('Créer un pare-feu/Security Group (Neutron)')),
     
-    # 💾 STORAGE (Cinder & Glance - Disques et Images)
+    # STORAGE (Cinder & Glance - Disques et Images)
     ('volume:create', _('Créer un disque dur/Volume (Cinder)')),
     ('volume:delete', _('Supprimer un disque dur (Cinder)')),
     ('add_image', _('Uploader une image système (Glance)')),

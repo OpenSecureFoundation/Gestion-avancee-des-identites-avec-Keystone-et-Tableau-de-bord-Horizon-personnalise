@@ -276,7 +276,9 @@ class AuthInfo(provider_api.ProviderAPIMixin):
         """Validate and normalize scope data."""
         if 'identity' in self.auth:
             if 'application_credential' in self.auth['identity']['methods']:
-                # Application credentials can't choose their own scope
+                # Application credentials can't choose their own scopeif getattr(ctxt, 'is_admin', False):
+            #     LOG.debug("ABAC: Super-Admin detecte. Contournement des regles ABAC autorise.")
+            #     return
                 if 'scope' in self.auth:
                     detail = "Application credentials cannot request a scope."
                     raise exception.ApplicationCredentialAuthError(

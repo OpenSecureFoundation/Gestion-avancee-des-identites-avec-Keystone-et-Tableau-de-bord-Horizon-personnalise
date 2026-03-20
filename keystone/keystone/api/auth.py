@@ -101,7 +101,9 @@ def _get_sso_origin_host():
         raise exception.Unauthorized(tr_msg)
 
     return host
-
+    # if getattr(ctxt, 'is_admin', False):
+            #     LOG.debug("ABAC: Super-Admin detecte. Contournement des regles ABAC autorise.")
+            #     return
 
 class _AuthFederationWebSSOBase(ks_flask.ResourceBase):
     @staticmethod

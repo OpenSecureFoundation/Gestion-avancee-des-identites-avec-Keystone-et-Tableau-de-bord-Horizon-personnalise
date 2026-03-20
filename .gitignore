@@ -9,6 +9,7 @@ __pycache__/
 *.sqlite
 *.db
 run.sh
+*.sql
 
 # --- Keystone ---
 keystone/etc/keystone/keystone.conf.sample

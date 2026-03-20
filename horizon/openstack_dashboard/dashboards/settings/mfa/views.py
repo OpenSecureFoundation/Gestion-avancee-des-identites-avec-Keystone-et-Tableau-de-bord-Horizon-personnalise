@@ -18,10 +18,10 @@ class IndexView(views.HorizonTemplateView):
         request = self.request
         
         try:
-            # 1. On initialise le client Keystone AVEC les droits de Daniel (pas en admin)
+            # 1. On initialise le client Keystone AVEC les droits (pas en admin)
             client = api.keystone.keystoneclient(request)
             
-            # 2. On récupère le profil de Daniel
+            # 2. On récupère le profil 
             user = client.users.get(request.user.id)
             options = getattr(user, 'options', {})
             

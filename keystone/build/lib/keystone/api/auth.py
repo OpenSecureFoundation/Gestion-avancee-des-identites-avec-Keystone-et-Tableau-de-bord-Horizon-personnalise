@@ -102,7 +102,6 @@ def _get_sso_origin_host():
 
     return host
 
-
 class _AuthFederationWebSSOBase(ks_flask.ResourceBase):
     @staticmethod
     def _render_template_response(host, token_id):
