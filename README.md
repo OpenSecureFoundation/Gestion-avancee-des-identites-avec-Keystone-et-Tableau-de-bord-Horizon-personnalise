@@ -39,3 +39,5 @@ Les prochaines étapes se concentrent sur l'ouverture de l'infrastructure vers l
 * **Backend :** Python, Django, OpenStack Keystone API
 * **Frontend :** OpenStack Horizon, SCSS, Bootstrap 3, JavaScript (ES6)
 * **Librairies Data/Export :** Chart.js, html2pdf.js
+
+## 🛠️ Comment déployer ?

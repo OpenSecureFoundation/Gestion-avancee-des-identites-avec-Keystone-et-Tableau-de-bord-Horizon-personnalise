@@ -22,3 +22,9 @@ horizon/.secret_key_store
 
 # (Optionnel) Sauvegardes
 backups/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
